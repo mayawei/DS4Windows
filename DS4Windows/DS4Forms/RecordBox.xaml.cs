@@ -269,7 +269,9 @@ namespace DS4WinWPF.DS4Forms
 
         private void SavePresetBtn_Click(object sender, RoutedEventArgs e)
         {
-            macroListBox.ItemsSource = null;
+            // Reset selected index of macro list before removing item source
+            macroListBox.SelectedIndex = -1;
+
             SaveFileDialog dialog = new SaveFileDialog();
             dialog.AddExtension = true;
             dialog.DefaultExt = ".txt";
@@ -281,8 +283,6 @@ namespace DS4WinWPF.DS4Forms
                 //recordBoxVM.MacroSteps.Clear();
                 recordBoxVM.SavePreset(dialog.FileName);
             }
-
-            macroListBox.ItemsSource = recordBoxVM.MacroSteps;
         }
 
         private void UserControl_KeyDown(object sender, KeyEventArgs e)
@@ -324,6 +324,16 @@ namespace DS4WinWPF.DS4Forms
                             DS4Windows.MacroStep.StepType.ActUp, DS4Windows.MacroStep.StepOutput.Key);
                     recordBoxVM.AddMacroStep(step);
                     recordBoxVM.KeysdownMap.Remove(value);
+                }
+                else if (RecordBoxViewModel.KeydownOverrides.Contains(value))
+                {
+                    DS4Windows.MacroStep step = new DS4Windows.MacroStep(value, tempKey.ToString(),
+                            DS4Windows.MacroStep.StepType.ActDown, DS4Windows.MacroStep.StepOutput.Key);
+                    recordBoxVM.AddMacroStep(step, ignoreDelay: true);
+
+                    step = new DS4Windows.MacroStep(value, tempKey.ToString(),
+                            DS4Windows.MacroStep.StepType.ActUp, DS4Windows.MacroStep.StepOutput.Key);
+                    recordBoxVM.AddMacroStep(step, ignoreDelay: true);
                 }
 
                 e.Handled = true;
@@ -424,6 +434,9 @@ namespace DS4WinWPF.DS4Forms
 
         private void CycleProgPresetMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            // Reset selected index of macro list before removing item source
+            macroListBox.SelectedIndex = -1;
+
             macroListBox.ItemsSource = null;
             recordBoxVM.MacroSteps.Clear();
             recordBoxVM.WriteCycleProgramsPreset();
@@ -432,6 +445,9 @@ namespace DS4WinWPF.DS4Forms
 
         private void LoadPresetFromFileMenuItem_Click(object sender, RoutedEventArgs e)
         {
+            // Reset selected index of macro list before removing item source
+            macroListBox.SelectedIndex = -1;
+
             macroListBox.ItemsSource = null;
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.AddExtension = true;
